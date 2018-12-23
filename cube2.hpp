@@ -25,7 +25,21 @@ private:
   void del(int** instance);
   void printmap(int**i);
   struct path{
-    int**cube;
+    path(){
+      cube = NULL;
+      side = -1;
+      clock = 0;
+      previous = NULL;
+    }
+    path(int s, int cl, int**cu, path*p){
+      cube = cu;
+      side = s;
+      clock = cl;
+      previous = p;
+    }
+    int **cube;
+    int side;
+    int clock;
     path *previous;
   };
 };

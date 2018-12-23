@@ -1,12 +1,14 @@
 #include <iostream>
 #include <queue>
 #include <stdlib.h>
+#include <vector>
 #include "cube2.hpp"
 using std::cout;
 using std::string;
 using std::cin;
 using std::queue;
 using std::to_string;
+using std::vector;
 
 cube2::cube2(){
   bool debug = true;//debug mode switcher
@@ -313,35 +315,50 @@ void cube2::solve(){
     //make a current variable to hold
     int**current;
     int**temp;
-    queue<int**> q;
-    q.push(rubiks);
+    path temppath;
+    path previous = path(-1,-1,rubiks,NULL);
+    queue<path> q;
+    q.push(previous);
     int count = 0;
-    bool found = check(q.front());
+    bool found = check(q.front().cube);
+    vector<path> paths;
+    // paths.push_back(previous);
     //uses BFS to find the solved cube
     while(!found){
       count++;
-      current = q.front();
+      current = q.front().cube;
+      paths.push_back(q.front());
+      previous = q.front();
       q.pop();
       for(int side = 0; side < 6; side++){
         temp = rotate(current,side,0);
         if(check(temp)){
           found = true;
         }
-        q.push(temp);
+        q.push(path(side,0,temp,&previous));
         temp = rotate(current,side,1);
         if(check(temp)){
           found = true;
         }
-        q.push(temp);
+        q.push(path(side,1,temp,&previous));
       }
-      if(current != rubiks){
-        del(current);
-      }
+      // if(current != rubiks){
+        // del(current);
+      // }
     }
     cout << count << " found the solution\n";
+    temppath = q.back();
+    while(temppath.previous!=NULL){
+      cout << getside(temppath.side) << " " << (temppath.clock ? "counter-" : "") << "clockwise\n";
+      temppath = *(temppath.previous);
+    }
+
+    del(rubiks);
+    rubiks = q.front().cube;
+    q.pop();
     //delete everything in the queue
     while(!q.empty()){
-      del(q.front());
+      del(q.front().cube);
       q.pop();
     }
   }
@@ -374,13 +391,17 @@ bool cube2::check(int**instance){
 void cube2::scramble(){
   // srand(time(NULL)); //make it random
   bool debug = true;
+  int side;
+  bool clock;
   cout << "scrambling\n";
   if(debug){
-    rot(0,0);
+    side = 0;
+    clock = 0;
+    rot(side,clock);
+    cout << "rotating " << getside(side) << " " << (clock ? "counter-" : "") << "clockwise\n";
+
     // rot(3,1);
   }else{
-    int side;
-    bool clock;
     for(int rep = 10+rand()%10; rep>0; rep--){
       side = rand()%6;
       clock = rand()%2;
