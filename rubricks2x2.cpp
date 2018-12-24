@@ -7,9 +7,14 @@ int main(){
   cube2 game;
   // game.print();
   game.printmap();
+  cout << game.sgetcheck() << "\n";
   game.scramble();
-  game.printmap();
+  // game.printmap();
+  // cout << game.sgetcheck() << "\n";
+  cout << "---------------------------\n";
   game.solve();
-  game.printmap();
+  // game.print();
+  // game.printmap();
+  // cout << game.sgetcheck() << "\n";
   return 0;
 }

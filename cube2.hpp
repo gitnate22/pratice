@@ -11,6 +11,8 @@ public:
   void printmap();
   void solve();
   void scramble();
+  bool getcheck();
+  string sgetcheck();
 private:
   int**rubiks;
   void rot(int side, bool clock);
