@@ -31,9 +31,9 @@ private:
       cube = NULL;
       side = -1;
       clock = 0;
-      previous = NULL;
+      previous = -1;
     }
-    path(int s, int cl, int**cu, path*p){
+    path(int s, int cl, int**cu, int p){
       cube = cu;
       side = s;
       clock = cl;
@@ -42,7 +42,7 @@ private:
     int **cube;
     int side;
     int clock;
-    path *previous;
+    int previous;
   };
 };
 

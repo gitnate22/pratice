@@ -11,7 +11,7 @@ using std::to_string;
 using std::vector;
 
 cube2::cube2(){
-  bool debug = true;//debug mode switcher
+  bool debug = false;//debug mode switcher
   rubiks =  new int*[6];
   for(int side = 0; side < 6; side++){
     rubiks[side] = new int[4];
@@ -304,7 +304,7 @@ int **cube2::rotate(int**prev, int side, bool clock){
 void cube2::solve(){
   bool debug = false;
   if(debug){
-    cout << "rubricks\n";
+    cout << "rubriks\n";
     printmap();
     int** current = rotate(rubiks, 0, 0);
     cout << "current after roation\n";
@@ -313,32 +313,40 @@ void cube2::solve(){
     del(current);
   } else {
     //make a current variable to hold
-    int**current;
+    int current;
+    int previous;
     int**temp;
-    path previous = path(-1,-1,rubiks,NULL);
-    queue<path> q;
-    q.push(previous);
-    int count = 0;
-    bool found = check(q.front().cube);
     vector<path> paths;
+    paths.push_back(path(-1,0,rubiks,-1));
+    queue<unsigned> q;
+    q.push(0);
+    int count = 0;
+    bool found = check(paths[q.front()].cube);
     // paths.push_back(previous);
     //uses BFS to find the solved cube
     while(!found){
-      count++;
-      current = q.front().cube;
-      paths.push_back(q.front());
+      current = q.front();
+      // paths.push_back(q.front());
       previous = q.front();
       q.pop();
       for(int side = 0; side < 6; side++){
-        temp = rotate(current,side,0);
-        q.push(path(side,0,temp,&previous));
+        count++;
+        // cout << found << "\n";
+        temp = rotate(paths[current].cube,side,0);
+        paths.push_back(path(side,0,temp,previous));
+        q.push(paths.size()-1);
         if(check(temp)){
+          cout << "solution is at "<< paths.size()-1 << "\n";
+          printmap(temp);
           found = true;
           break;
         }
-        temp = rotate(current,side,1);
-        q.push(path(side,1,temp,&previous));
+        temp = rotate(paths[current].cube,side,1);
+        paths.push_back(path(side,1,temp,previous));
+        q.push(paths.size()-1);
         if(check(temp)){
+          cout << "solution is at "<< paths.size()-1 << "\n";
+          printmap(temp);
           found = true;
           break;
         }
@@ -347,21 +355,33 @@ void cube2::solve(){
         // del(current);
       // }
     }
-    path *temppath;
-    cout << count << " found the solution\n";
-    temppath = &q.back();
-    while(temppath->previous!=NULL){
-      cout << getside(temppath->side) << " " << (temppath->clock ? "counter-" : "") << "clockwise\n";
-      temppath = temppath->previous;
+    // for(unsigned i = 0; i < paths.size(); i++){
+    //   cout << i << " " << paths[i].previous << " ";// << "\n";
+    //   cout << getside(paths[i].side) << " " << (paths[i].clock ? "counter-" : "") << "clockwise\n";
+    // }
+    int temppath;
+    cout << count << " found the solution at "<< q.back() << "\n";
+    temppath = q.back();
+    // printmap(paths[temppath].cube);
+    while(paths[temppath].previous!=-1){
+      cout << getside(paths[temppath].side) << " " << (paths[temppath].clock ? "counter-" : "") << "clockwise\n";
+      rot(paths[temppath].side,paths[temppath].clock);
+      temppath = paths[temppath].previous;
     }
+    printmap();
     // del(rubiks);
     // rubiks = temp;
     // temp = NULL;
     // q.pop();
     //delete everything in the queue
-    while(!q.empty()){
-      del(q.front().cube);
-      q.pop();
+    // while(!q.empty()){
+    //   del(q.front().cube);
+    //   q.pop();
+    // }
+    for(int i = 0; i<paths.size(); i++){
+      if(paths[i].cube != rubiks){
+        del(paths[i].cube);
+      }
     }
   }
 }
@@ -407,12 +427,12 @@ void cube2::scramble(){
   if(debug){
     side = 0;
     clock = 0;
-    cout << "rotating " << getside(side) << " " << (clock ? "counter-" : "") << "clockwise\n";
+    cout << getside(side) << " " << (clock ? "counter-" : "") << "clockwise\n";
     rot(side,clock);
-    // side = 2;
-    // clock = 1;
-    // cout << "rotating " << getside(side) << " " << (clock ? "counter-" : "") << "clockwise\n";
-    // rot(side,clock);
+    side = 2;
+    clock = 1;
+    cout << getside(side) << " " << (clock ? "counter-" : "") << "clockwise\n";
+    rot(side,clock);
     // rot(3,1);
   }else{
     for(int rep = 10+rand()%10; rep>0; rep--){
